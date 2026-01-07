@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 📊 Product Inventory Management Dashboard
 
-## Getting Started
+![Next JS](https://img.shields.io/badge/Next-black?style=for-the-badge&logo=next.js&logoColor=white)
+![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)![MySQL](https://img.shields.io/badge/mysql-4479A1.svg?style=for-the-badge&logo=mysql&logoColor=white)
 
-First, run the development server:
+Aplikasi web untuk mengelola inventaris produk dengan fitur CRUD lengkap, built dengan Next.js 14, Tailwind CSS, dan MySQL.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🌐 Base URL
+
+#### Development (Local)
+
+```http
+http://localhost:3000/
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+#### Production (Vercel)
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+```http
+https://crud-inventory-product.vercel.app/
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## ✨ Features
 
-## Learn More
+### ✅ CRUD Operations
 
-To learn more about Next.js, take a look at the following resources:
+- Create: Tambah produk baru dengan modal form
+- Read: Lihat daftar produk dengan pagination
+- Update: Edit produk yang ada
+- Delete: Hapus produk dengan konfirmasi
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### ✅ Validation
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Product Name: Required, max 255 characters
+- Amount: Required, > 0, decimal format
+- Quantity: Required, >= 0, integer
 
-## Deploy on Vercel
+## 🌐 API Endpoints
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Method | Endpoint             | Description        |
+| ------ | -------------------- | ------------------ |
+| GET    | `/api/products`      | Get all products   |
+| POST   | `/api/products`      | Create new product |
+| GET    | `/api/products/[id]` | Get single product |
+| PUT    | `/api/products/[id]` | Update product     |
+| DELETE | `/api/products/[id]` | Delete product     |

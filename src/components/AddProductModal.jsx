@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 
-export default function AddProductModal({ isOpen, onClose, onAdd }) {
+export default function AddProductModal({ isOpen, onClose, onAdd, showNotification }) {
   const [formData, setFormData] = useState({
     product_name: "",
     amount: "",
@@ -57,18 +57,36 @@ export default function AddProductModal({ isOpen, onClose, onAdd }) {
     setLoading(true);
 
     try {
-      await onAdd({
+      const response = await onAdd({
         product_name: formData.product_name.trim(),
         amount: parseFloat(formData.amount),
         qty: parseInt(formData.qty),
       });
 
-      // Reset form
-      setFormData({ product_name: "", amount: "", qty: "" });
-      setErrors({});
-      onClose();
+      if (response && response.success) {
+        showNotification("success", response.message || "Product created successfully");
+        setFormData({ product_name: "", amount: "", qty: "" });
+        setErrors({});
+        onClose();
+      } else {
+        if (response && response.errors) {
+          setErrors(response.errors);
+          showNotification("error", "Please check the form for errors");
+        } else {
+          showNotification("error", response?.error || "Failed to add product");
+        }
+      }
     } catch (error) {
       console.error("Error adding product:", error);
+
+      if (error.message) {
+        showNotification("error", error.message);
+      } else if (error.errors) {
+        setErrors(error.errors);
+        showNotification("error", "Please check the form for errors");
+      } else {
+        showNotification("error", "Failed to add product. Please try again.");
+      }
     } finally {
       setLoading(false);
     }
@@ -82,79 +100,74 @@ export default function AddProductModal({ isOpen, onClose, onAdd }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/50 backdrop-blur-sm">
-      <div className="w-full max-w-lg overflow-hidden bg-white dark:bg-card-dark rounded-xl shadow-2xl ring-1 ring-black/5 dark:ring-white/10 transform transition-all">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#e5e7eb] dark:border-gray-800">
-          <h3 className="text-lg font-bold text-[#111418] dark:text-white">Add New Product</h3>
-          <button onClick={onClose} className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors">
+      <div className="w-full max-w-lg overflow-hidden bg-white rounded-xl shadow-2xl ring-1 ring-black/5  transform transition-all">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[#e5e7eb] ">
+          <h3 className="text-lg font-bold text-[#111418] ">Add New Product</h3>
+          <button onClick={onClose} className="text-gray-500 hover:text-gray-700 transition-colors">
             <span className="material-symbols-outlined">close</span>
           </button>
         </div>
         <form onSubmit={handleSubmit}>
           <div className="px-6 py-6 space-y-5">
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-[#111418] dark:text-gray-200">Product Name *</label>
+              <label className="text-sm font-medium text-[#111418]">Product Name *</label>
               <input
                 name="product_name"
                 value={formData.product_name}
                 onChange={(e) => handleChange(e)}
                 className={`w-full h-11 px-4 rounded-lg border ${
-                  errors.product_name ? "border-red-500 focus:ring-red-500/50" : "border-[#dbe0e6] dark:border-gray-700 focus:ring-primary/50"
-                } bg-white dark:bg-[#101822] text-[#111418] dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 transition-shadow`}
+                  errors.product_name ? "border-red-500 focus:ring-red-500/50" : "border-[#dbe0e6] focus:ring-primary/50"
+                } bg-white text-[#111418] placeholder-gray-400 focus:outline-none focus:ring-2 transition-shadow`}
                 placeholder="e.g. Mechanical Keyboard"
                 type="text"
                 disabled={loading}
               />
-              {errors.product_name && <p className="text-xs text-red-500">{errors.product_name}</p>}
+              {errors.product_name && <p className="text-xs text-red-500">{typeof errors.product_name === "string" ? errors.product_name : errors.product_name?.join(", ")}</p>}
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-[#111418] dark:text-gray-200">Amount (USD) *</label>
+                <label className="text-sm font-medium text-[#111418]">Amount (Rp) *</label>
                 <input
                   name="amount"
                   value={formData.amount}
                   onChange={(e) => handleChange(e)}
                   className={`w-full h-11 px-4 rounded-lg border ${
-                    errors.amount ? "border-red-500 focus:ring-red-500/50" : "border-[#dbe0e6] dark:border-gray-700 focus:ring-primary/50"
-                  } bg-white dark:bg-[#101822] text-[#111418] dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 transition-shadow`}
-                  placeholder="0.00"
+                    errors.amount ? "border-red-500 focus:ring-red-500/50" : "border-[#dbe0e6]  focus:ring-primary/50"
+                  } bg-white text-[#111418] placeholder-gray-400 focus:outline-none focus:ring-2 transition-shadow`}
+                  placeholder="Rp 10.000"
                   step="0.01"
                   type="number"
                   min="0"
                   disabled={loading}
                 />
-                {errors.amount && <p className="text-xs text-red-500">{errors.amount}</p>}
+                {errors.amount && <p className="text-xs text-red-500">{typeof errors.amount === "string" ? errors.amount : errors.amount?.join(", ")}</p>}
               </div>
               <div className="space-y-1.5">
-                <label className="text-sm font-medium text-[#111418] dark:text-gray-200">Quantity *</label>
+                <label className="text-sm font-medium text-[#111418] ">Quantity *</label>
                 <input
                   name="qty"
                   value={formData.qty}
                   onChange={(e) => handleChange(e)}
                   className={`w-full h-11 px-4 rounded-lg border ${
-                    errors.qty ? "border-red-500 focus:ring-red-500/50" : "border-[#dbe0e6] dark:border-gray-700 focus:ring-primary/50"
-                  } bg-white dark:bg-[#101822] text-[#111418] dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 transition-shadow`}
+                    errors.qty ? "border-red-500 focus:ring-red-500/50" : "border-[#dbe0e6]  focus:ring-primary/50"
+                  } bg-white text-[#111418]  placeholder-gray-400 focus:outline-none focus:ring-2 transition-shadow`}
                   placeholder="0"
                   type="number"
                   min="0"
                   disabled={loading}
                 />
-                {errors.qty && <p className="text-xs text-red-500">{errors.qty}</p>}
+                {errors.qty && <p className="text-xs text-red-500">{typeof errors.qty === "string" ? errors.qty : errors.qty?.join(", ")}</p>}
               </div>
             </div>
           </div>
-          <div className="flex items-center justify-end gap-3 px-6 py-4 bg-gray-50 dark:bg-gray-800/50 border-t border-[#e5e7eb] dark:border-gray-800">
-            <button
-              type="button"
-              onClick={handleCancel}
-              disabled={loading}
-              className="px-5 h-10 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors disabled:opacity-50"
-            >
+          <div className="flex items-center justify-end gap-3 px-6 py-4 bg-gray-50 border-t border-[#e5e7eb] ">
+            <button type="button" onClick={handleCancel} disabled={loading} className="px-5 h-10 rounded-lg text-sm font-medium text-gray-600 bg-gray-300 hover:bg-gray-300/90 transition-colors disabled:opacity-50 cursor-pointer">
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-5 h-10 rounded-lg text-sm font-bold text-white bg-blue-500 hover:bg-blue-500/90 shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+              className="px-5 h-10 rounded-lg text-sm font-bold text-white bg-blue-500 hover:bg-blue-500/90 shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 cursor-pointer"
             >
               {loading ? (
                 <>

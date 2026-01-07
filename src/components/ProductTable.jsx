@@ -10,15 +10,15 @@ export default function ProductTable({ products, onEdit, onDelete }) {
   };
 
   return (
-    <div className="w-full overflow-hidden rounded-xl border border-[#dbe0e6] dark:border-gray-700 bg-white dark:bg-card-dark shadow-sm">
+    <div className="w-full overflow-hidden rounded-xl border border-[#dbe0e6] bg-white shadow-sm">
       <div className="overflow-x-auto">
         <table className="w-full min-w-200">
           <thead>
-            <tr className="bg-[#f9fafb] dark:bg-gray-800/50 border-b border-[#dbe0e6] dark:border-gray-700">
-              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-[#617289] dark:text-gray-400 w-[40%]">Product Name</th>
-              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-[#617289] dark:text-gray-400 w-[20%]">Amount</th>
-              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-[#617289] dark:text-gray-400 w-[20%]">Quantity</th>
-              <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-[#617289] dark:text-gray-400 w-[20%]">Actions</th>
+            <tr className="bg-[#f9fafb]  border-b border-[#dbe0e6] ">
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-[#617289] w-[40%]">Product Name</th>
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-[#617289] w-[20%]">Amount</th>
+              <th className="px-6 py-4 text-left text-xs font-semibold uppercase tracking-wider text-[#617289] w-[20%]">Quantity</th>
+              <th className="px-6 py-4 text-right text-xs font-semibold uppercase tracking-wider text-[#617289] w-[20%]">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[#dbe0e6] dark:divide-gray-700">
@@ -35,7 +35,7 @@ export default function ProductTable({ products, onEdit, onDelete }) {
                   </div>
                 </td>
                 <td className="px-6 py-4 text-sm font-medium text-[#111418] dark:text-gray-200">{formatCurrency(product.amount)}</td>
-                <td className="px-6 py-4 text-sm text-[#617289] dark:text-gray-400">{product.qty} units</td>
+                <td className="px-6 py-4 text-sm text-[#617289]">{product.qty} units</td>
                 <td className="px-6 py-4">
                   <div className="flex justify-end gap-2">
                     <button onClick={() => onEdit(product)} className="h-8 w-8 flex items-center justify-center rounded-lg text-gray-500 hover:bg-primary/10 hover:text-primary transition-colors" title="Edit">

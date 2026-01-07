@@ -19,6 +19,18 @@ export default function Home() {
     total: 0,
     totalPages: 1,
   });
+  const [notification, setNotification] = useState({
+    show: false,
+    type: "",
+    message: "",
+  });
+
+  const showNotification = (type, message) => {
+    setNotification({ show: true, type, message });
+    setTimeout(() => {
+      setNotification({ show: false, type: "", message: "" });
+    }, 3000);
+  };
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
@@ -78,15 +90,19 @@ export default function Home() {
 
       if (data.success) {
         fetchProducts();
-        return data;
+        return {
+          success: true,
+          message: data.message,
+          errors: data.errors,
+        };
       } else {
-        const errorMessage = data.errors ? Object.values(data.errors).join(", ") : data.error || "Failed to add product";
-        throw new Error(errorMessage);
+        const error = new Error(data.error || "Failed to add product");
+        error.errors = data.errors;
+        throw error;
       }
     } catch (error) {
       console.error("Error adding product:", error);
-      // Lempar error dengan pesan yang jelas
-      throw new Error(error.message || "Failed to add product. Please try again.");
+      throw error;
     }
   };
 
@@ -104,12 +120,16 @@ export default function Home() {
 
       if (data.success) {
         fetchProducts();
+        showNotification("success", data.message || "Product updated successfully");
         return data;
       } else {
-        throw new Error(data.errors || data.error);
+        const error = new Error(data.error || "Failed to update product");
+        error.errors = data.errors;
+        throw error;
       }
     } catch (error) {
       console.error("Error updating product:", error);
+      showNotification("error", error.message || "Failed to update product");
       throw error;
     }
   };
@@ -126,12 +146,13 @@ export default function Home() {
 
       if (data.success) {
         fetchProducts();
+        showNotification("success", data.message || "Product deleted successfully");
       } else {
-        alert(data.error || "Failed to delete product");
+        showNotification("error", data.error || "Failed to delete product");
       }
     } catch (error) {
       console.error("Error deleting product:", error);
-      alert("Failed to delete product");
+      showNotification("error", "Failed to delete product");
     }
   };
 
@@ -142,28 +163,38 @@ export default function Home() {
   return (
     <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden">
       <Header />
+      {notification.show && (
+        <div className="fixed top-4 right-4 z-100 animate-slide-in">
+          <div className={`px-4 py-3 rounded-lg shadow-lg ${notification.type === "success" ? "bg-green-50 border border-green-200 text-green-800" : "bg-red-50 border border-red-200 text-red-800"}`}>
+            <div className="flex items-center gap-2">
+              {notification.type === "success" ? <span className="material-symbols-outlined text-green-600">check_circle</span> : <span className="material-symbols-outlined text-red-600">error</span>}
+              <span className="text-sm font-medium">{notification.message}</span>
+            </div>
+          </div>
+        </div>
+      )}
       <main className="flex-1 flex flex-col items-center py-10 px-6 sm:px-10 lg:px-20">
         <div className="w-full max-w-7xl flex flex-col gap-8">
           <div className="flex flex-wrap justify-between items-end gap-4">
             <div className="flex min-w-72 flex-col gap-2">
-              <h1 className="text-[#111418] dark:text-white text-3xl sm:text-4xl font-black leading-tight tracking-[-0.033em]">Inventory Dashboard</h1>
-              <p className="text-[#617289] dark:text-gray-400 text-base font-normal leading-normal">Manage your product inventory, prices, and stock levels efficiently.</p>
+              <h1 className="text-[#111418] text-3xl sm:text-4xl font-black leading-tight tracking-[-0.033em]">Inventory Dashboard</h1>
+              <p className="text-[#617289] text-base font-normal leading-normal">Manage your product inventory, prices, and stock levels efficiently.</p>
             </div>
 
             <div className="relative">
               <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-                <span className="material-symbols-outlined text-gray-400 dark:text-gray-500">search</span>
+                <span className="material-symbols-outlined text-gray-400">search</span>
               </div>
               <input
                 type="text"
                 value={searchTerm}
                 onChange={handleSearchChange}
                 placeholder="Search products..."
-                className="pl-10 pr-10 py-2 w-full sm:w-64 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+                className="pl-10 pr-10 py-2 w-full sm:w-64 border border-gray-300 rounded-lg bg-white  text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
               />
               {searchTerm && (
                 <button onClick={handleClearChange} className="absolute inset-y-0 right-0 flex items-center pr-3">
-                  <span className="material-symbols-outlined text-gray-400 hover:text-gray-600 dark:hover:text-gray-300">close</span>
+                  <span className="material-symbols-outlined text-gray-400 hover:text-gray-600 ">close</span>
                 </button>
               )}
             </div>
@@ -183,9 +214,9 @@ export default function Home() {
             </div>
           ) : products.length === 0 ? (
             <div className="text-center py-16">
-              <span className="material-symbols-outlined text-6xl text-gray-300 dark:text-gray-600 mb-4">inventory_2</span>
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No products found</h3>
-              <p className="text-gray-500 dark:text-gray-400">Get started by adding your first product.</p>
+              <span className="material-symbols-outlined text-6xl text-gray-300  mb-4">inventory_2</span>
+              <h3 className="text-lg font-medium text-gray-900  mb-2">No products found</h3>
+              <p className="text-gray-500 ">Get started by adding your first product.</p>
             </div>
           ) : (
             <>
@@ -197,9 +228,9 @@ export default function Home() {
         </div>
       </main>
 
-      <AddProductModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} onAdd={handleAddProduct} />
+      <AddProductModal isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} onAdd={handleAddProduct} showNotification={showNotification} />
 
-      {editingProduct && <EditProductModal product={editingProduct} onClose={() => setEditingProduct(null)} onUpdate={handleUpdateProduct} />}
+      {editingProduct && <EditProductModal product={editingProduct} onClose={() => setEditingProduct(null)} onUpdate={handleUpdateProduct} showNotification={showNotification} />}
     </div>
   );
 }

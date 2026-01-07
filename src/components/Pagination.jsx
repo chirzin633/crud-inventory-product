@@ -36,17 +36,12 @@ export default function Pagination({ currentPage, totalPages, totalItems, itemsP
   };
 
   return (
-    <div className="flex flex-col sm:flex-row items-center justify-between border-t border-gray-200 dark:border-gray-800 pt-4 gap-4">
-      <p className="text-sm text-gray-500 dark:text-gray-400">
-        Showing <span className="font-medium text-[#111418] dark:text-white">{startItem}</span> to <span className="font-medium text-[#111418] dark:text-white">{endItem}</span> of{" "}
-        <span className="font-medium text-[#111418] dark:text-white">{totalItems}</span> results
+    <div className="flex flex-col sm:flex-row items-center justify-between border-t border-gray-200 pt-4 gap-4">
+      <p className="text-sm text-gray-500 ">
+        Showing <span className="font-medium text-[#111418] ">{startItem}</span> to <span className="font-medium text-[#111418] ">{endItem}</span> of <span className="font-medium text-[#111418] ">{totalItems}</span> results
       </p>
       <div className="flex items-center gap-1">
-        <button
-          onClick={handlePrevious}
-          disabled={currentPage === 1}
-          className="flex size-9 items-center justify-center rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
+        <button onClick={handlePrevious} disabled={currentPage === 1} className="flex size-9 items-center justify-center rounded-lg text-gray-500 hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
           <span className="material-symbols-outlined text-[20px]">chevron_left</span>
         </button>
 
@@ -59,20 +54,14 @@ export default function Pagination({ currentPage, totalPages, totalItems, itemsP
             <button
               key={page}
               onClick={() => onPageChange(page)}
-              className={`flex size-9 items-center justify-center rounded-lg text-sm font-medium transition-colors ${
-                currentPage === page ? "bg-primary text-white shadow-sm shadow-primary/30" : "text-[#111418] dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-              }`}
+              className={`flex size-9 items-center justify-center rounded-lg text-sm font-medium transition-colors ${currentPage === page ? "bg-primary text-white shadow-sm shadow-primary/30" : "text-[#111418] hover:bg-gray-100"}`}
             >
               {page}
             </button>
           )
         )}
 
-        <button
-          onClick={handleNext}
-          disabled={currentPage === totalPages}
-          className="flex size-9 items-center justify-center rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
+        <button onClick={handleNext} disabled={currentPage === totalPages} className="flex size-9 items-center justify-center rounded-lg text-gray-500  hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
           <span className="material-symbols-outlined text-[20px]">chevron_right</span>
         </button>
       </div>
